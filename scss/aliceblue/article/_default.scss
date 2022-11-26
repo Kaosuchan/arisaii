@@ -1,0 +1,78 @@
+@use "sass:color";
+@use "sass:math";
+
+@function fade-by($color, $rate: 0.9) {
+  $alpha: color.alpha($color);
+  $delta: $alpha * $rate - $alpha;
+  @return color.adjust($color, $alpha: $delta);
+}
+
+@mixin article-default(
+  $article: "article",
+  $color: black,
+  $theme-color: #ffff
+) {
+  #{$article},
+  #{$article} > blockquote {
+    > * {
+      transition: 0.5s;
+      color: fade-by($color);
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    > *:hover {
+      color: $color;
+    }
+
+    $header-font-size: 2.7;
+
+    @for $i from 1 through 6 {
+      > h#{$i} {
+        font-size: $header-font-size * 1em;
+        font-weight: bold;
+        margin-bottom: math.div(0.7em, $header-font-size);
+        text-align: center;
+      }
+      $header-font-size: $header-font-size * 0.9;
+    }
+
+    $width: math.div(50%, 3);
+    @for $i from 1 through 2 {
+      > h#{$i}::after {
+        $margin: math.div(100% - $width, 2);
+        transition: 0.5s;
+        content: '';
+        display: block;
+        width: $width;
+        height: 0.07em;
+        box-sizing: border-box;
+        margin: 0 $margin 0 $margin;
+        border-bottom: 0.07em fade-by($color);
+        border-bottom-style: dotted;
+      }
+      > h#{$i}:hover::after {
+        $margin: math.div(100% - $width * 3, 2);
+        width: $width * 3;
+        margin: 0 $margin 0 $margin;
+        border-bottom: 0.03em $color;
+        border-bottom-style: dotted;
+      }
+      $width: $width * 0.9;
+    }
+
+    > p {
+      font-size: 1em;
+    }
+
+    > img {
+      opacity: 0.8;
+      border-radius: 10%;
+    }
+
+    > img:hover {
+      opacity: 1;
+      border-radius: 0;
+    }
+  }
+}

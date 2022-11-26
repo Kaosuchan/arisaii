@@ -8,5 +8,5 @@ struct Aaa<'aaa> {
 
 #[test]
 fn askama_test1() {
-    println!("{}", Aaa { name: "aaa" }.render().unwrap());
+    assert_eq!(Aaa { name: "aaa" }.render().unwrap(), "aaa")
 }

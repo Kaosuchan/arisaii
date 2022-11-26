@@ -1,0 +1,24 @@
+@use "sass:list";
+
+@mixin burger(
+  $rename: "burger",
+  $make_burger: (
+    "top": 2,
+    "up": 1,
+    "middle": 0,
+    "down": -1,
+    "bottom": -2,
+  )
+) {
+  $length: list.length($make_burger);
+
+  @for $i from 1 through $length {
+    $pair: list.nth($make_burger, $i);
+    $key: list.nth($pair, 1);
+    $value: list.nth($pair, 2);
+
+    > .#{$rename}-#{$key} {
+      z-index: $value;
+    }
+  }
+}
