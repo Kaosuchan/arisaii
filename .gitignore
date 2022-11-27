@@ -2,3 +2,4 @@
 /dustbin
 Cargo.lock
 /css
+*/**/.DS_Store
