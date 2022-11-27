@@ -10,19 +10,53 @@
 @mixin article-default(
   $article: "article",
   $color: black,
-  $theme-color: #ffff
+  $link-color: deepskyblue,
+  $theme-color: #ffff,
+  $transition-duration: 0.4s,
+  $image-width: 800px
 ) {
   #{$article},
   #{$article} > blockquote {
+    font-size: min(1em, 4vw);
     > * {
-      transition: 0.5s;
+      transition: $transition-duration color;
       color: fade-by($color);
       width: 100%;
       box-sizing: border-box;
+
+      > a {
+        transition: $transition-duration;
+        text-decoration: none;
+        font-weight: bold;
+        color: fade-by($link-color);
+      }
+
+      > a:visited {
+        color: fade-by(
+          color.adjust($link-color, $hue: -90deg, $blackness: 20%)
+        );
+      }
     }
 
     > *:hover {
       color: $color;
+
+      > a:link {
+        color: $link-color;
+      }
+
+      > a:visited {
+        color: color.adjust($link-color, $hue: -90deg, $blackness: 20%);
+      }
+
+      > a:hover {
+        color: color.adjust($link-color, $hue: 15deg);
+        cursor: pointer;
+      }
+
+      > a:active {
+        color: color.adjust($link-color, $hue: 25deg, $blackness: -20%);
+      }
     }
 
     $header-font-size: 2.7;
@@ -41,8 +75,8 @@
     @for $i from 1 through 2 {
       > h#{$i}::after {
         $margin: math.div(100% - $width, 2);
-        transition: 0.5s;
-        content: '';
+        transition: $transition-duration;
+        content: "";
         display: block;
         width: $width;
         height: 0.07em;
@@ -63,16 +97,119 @@
 
     > p {
       font-size: 1em;
+      margin: 1em 0 1em 0;
+      line-height: 1.4em;
+      letter-spacing: 0.02em;
+      word-spacing: 0.04em;
+    }
+
+    > p::first-letter {
+      display: inline-block;
+      font-size: 2em;
+      font-weight: bold;
+      font-style: italic;
+      text-transform: capitalize;
+    }
+
+    > img,
+    > table,
+    > pre > code {
+      $width: "min(100%, " + $image-width + ")";
+      $margin: "calc((100% - " + $width + ") * 0.5)";
+      // box-sizing: border-box;
+      width: #{$width};
+      margin: 3em #{$margin};
     }
 
     > img {
+      margin: 3em 0;
+      display: inline;
+      transition: $transition-duration;
       opacity: 0.8;
-      border-radius: 10%;
+      border-radius: 2em;
     }
 
     > img:hover {
       opacity: 1;
       border-radius: 0;
+    }
+
+    > * > i {
+      font-size: 1lh;
+    }
+
+    > * > img {
+      transition: $transition-duration;
+      margin: 0 1em;
+      max-width: 50%;
+      min-width: 20%;
+      opacity: 0.9;
+    }
+
+    > * > img:nth-child(odd) {
+      float: left;
+      clear: both;
+    }
+
+    > * > img:nth-child(even) {
+      float: right;
+      clear: both;
+    }
+
+    > *:hover > img {
+      opacity: 1;
+    }
+
+    > p {
+      > em {
+        font-style: italic;
+      }
+    }
+
+    > table {
+      display: table;
+      border-collapse: collapse;
+      border: 3px solid $color;
+
+      > tbody,
+      > tfoot {
+        border-top: 2px solid $color;
+      }
+
+      > caption {
+        font-size: 1.4em;
+        font-weight: bold;
+        padding: 1em;
+      }
+
+      th,
+      td {
+        padding: 1em;
+        border: 1px solid $color;
+        transition: $transition-duration;
+      }
+
+      th:nth-child(odd),
+      td:nth-child(odd) {
+        background-color: color.adjust($theme-color, $blackness: 5%, $alpha: -0.5);
+      }
+
+      th:nth-child(even),
+      td:nth-child(even) {
+        background-color: color.adjust($theme-color, $blackness: -5%, $alpha: -0.5);
+      }
+    }
+
+    > table:hover {
+      th:nth-child(odd),
+      td:nth-child(odd) {
+        background-color: color.adjust($theme-color, $blackness: -5%);
+      }
+
+      th:nth-child(even),
+      td:nth-child(even) {
+        background-color: color.adjust($theme-color, $blackness: 5%);
+      }
     }
   }
 }
