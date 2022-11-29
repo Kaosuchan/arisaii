@@ -1,10 +1,22 @@
 @use "sass:color";
 @use "sass:math";
+@use "sass:list";
 
 @function fade-by($color, $rate: 0.9) {
   $alpha: color.alpha($color);
   $delta: $alpha * $rate - $alpha;
   @return color.adjust($color, $alpha: $delta);
+}
+
+@function list-extend($list, $prepender: "", $appender: "", $expections: ()) {
+  $res: ();
+
+  @for $i from 1 through list.length($list) {
+    $ele: list.nth($list, $i);
+    $res: list.join($res, $prepender + $ele + $appender, $separator: comma);
+  }
+
+  @return $res;
 }
 
 @mixin article-default(
@@ -13,11 +25,17 @@
   $link-color: deepskyblue,
   $theme-color: #ffff,
   $transition-duration: 0.4s,
-  $image-width: 800px
+  $image-width: 800px,
+  $minimal-font-size: 12px,
+  $font-family: inherit,
+  $code-font: monospace,
 ) {
+  $text-containers: (p, "ul > li", "ol > li", h1, h2, h3, h4, h5, h6);
   #{$article},
-  #{$article} > blockquote {
-    font-size: min(1em, 4vw);
+  #{$article} > blockquote,
+  #{$article} blockquote > blockquote {
+    font-family: $font-family;
+    font-size: max(min(1em, 4vw), $minimal-font-size);
     > * {
       transition: $transition-duration color;
       color: fade-by($color);
@@ -39,7 +57,7 @@
     }
 
     > *:hover {
-      color: $color;
+      color: red; //$color;
 
       > a:link {
         color: $link-color;
@@ -57,6 +75,48 @@
       > a:active {
         color: color.adjust($link-color, $hue: 25deg, $blackness: -20%);
       }
+    }
+
+    #{list-extend($text-containers, "> ")} {
+      > del {
+        text-decoration: line-through solid 0.1em;
+      }
+      > u {
+        text-decoration: underline dashed 0.1em;
+      }
+      > b {
+        font-style: bold;
+      }
+      > em, > i /* as italic */ {
+        font-style: italic;
+      }
+      font-size: 1em;
+      //margin: 1em 0 1em 0;
+      line-height: 1.4em;
+      letter-spacing: 0.02em;
+      word-spacing: 0.04em;
+    }
+
+    #{list-extend($text-containers, "> ", " > img")} {
+      transition: $transition-duration;
+      margin: 0 1em;
+      max-width: 50%;
+      min-width: 20%;
+      opacity: 0.9;
+    }
+
+    #{list-extend($text-containers, "> ", " > img:nth-child(odd)")} {
+      float: left;
+      clear: both;
+    }
+
+    #{list-extend($text-containers, "> ", " > img:nth-child(even)")} {
+      float: right;
+      clear: both;
+    }
+
+    #{list-extend($text-containers, "> ", ":hover > img")} {
+      opacity: 1;
     }
 
     $header-font-size: 2.7;
@@ -96,16 +156,12 @@
     }
 
     > p {
-      font-size: 1em;
-      margin: 1em 0 1em 0;
-      line-height: 1.4em;
-      letter-spacing: 0.02em;
-      word-spacing: 0.04em;
+      margin: 1em 0;
     }
 
     > p::first-letter {
       display: inline-block;
-      font-size: 2em;
+      font-size: 1.4em;
       font-weight: bold;
       font-style: italic;
       text-transform: capitalize;
@@ -113,12 +169,25 @@
 
     > img,
     > table,
-    > pre > code {
+    > pre {
       $width: "min(100%, " + $image-width + ")";
       $margin: "calc((100% - " + $width + ") * 0.5)";
       // box-sizing: border-box;
       width: #{$width};
       margin: 3em #{$margin};
+    }
+
+    > pre {
+      width: 100%;
+      box-sizing: border-box;
+      font-family: $code-font;
+      font-size: 0.9em;
+      padding: 2em 0em;
+      border-radius: 2em;
+      overflow-x: scroll;
+      > code {
+        width: 100%;
+      }
     }
 
     > img {
@@ -132,38 +201,6 @@
     > img:hover {
       opacity: 1;
       border-radius: 0;
-    }
-
-    > * > i {
-      font-size: 1lh;
-    }
-
-    > * > img {
-      transition: $transition-duration;
-      margin: 0 1em;
-      max-width: 50%;
-      min-width: 20%;
-      opacity: 0.9;
-    }
-
-    > * > img:nth-child(odd) {
-      float: left;
-      clear: both;
-    }
-
-    > * > img:nth-child(even) {
-      float: right;
-      clear: both;
-    }
-
-    > *:hover > img {
-      opacity: 1;
-    }
-
-    > p {
-      > em {
-        font-style: italic;
-      }
     }
 
     > table {
@@ -182,6 +219,10 @@
         padding: 1em;
       }
 
+      th {
+        text-align: center;
+      }
+
       th,
       td {
         padding: 1em;
@@ -191,12 +232,20 @@
 
       th:nth-child(odd),
       td:nth-child(odd) {
-        background-color: color.adjust($theme-color, $blackness: 5%, $alpha: -0.5);
+        background-color: color.adjust(
+          $theme-color,
+          $blackness: 5%,
+          $alpha: -0.5
+        );
       }
 
       th:nth-child(even),
       td:nth-child(even) {
-        background-color: color.adjust($theme-color, $blackness: -5%, $alpha: -0.5);
+        background-color: color.adjust(
+          $theme-color,
+          $blackness: -5%,
+          $alpha: -0.5
+        );
       }
     }
 
@@ -210,6 +259,74 @@
       td:nth-child(even) {
         background-color: color.adjust($theme-color, $blackness: 5%);
       }
+    }
+
+    > ol,
+    > ul,
+    ol > li > ol,
+    ol > li > ul,
+    ul > li > ol,
+    ul > li > ul,
+    ol > ol,
+    ol > ul,
+    ul > ol,
+    ul > ul {
+      // color: fade-by($color);
+      transition: $transition-duration;
+      font-size: 1em;
+      margin-left: 1em;
+      transition: none;
+      > li {
+        color: fade-by($color);
+        transition: $transition-duration;
+      }
+    }
+
+    > ul,
+    > ol {
+      margin-top: 1em;
+      margin-bottom: 1em;
+      margin-left: 2em;
+    }
+
+    > ol:hover,
+    > ul:hover,
+    ol > li > ol:hover,
+    ol > li > ul:hover,
+    ul > li > ol:hover,
+    ul > li > ul:hover,
+    ol > ol:hover,
+    ol > ul:hover,
+    ul > ol:hover,
+    ul > ul:hover {
+      > li {
+        color: fade-by($color);
+      }
+      > li:hover {
+        color: red;
+      }
+    }
+
+    > blockquote {
+      margin: 3em 0;
+      transition: opacity $transition-duration;
+      font-size: max(90%, $minimal-font-size);
+      opacity: 0.9;
+      background-color: fade-by(
+        color.adjust($theme-color, $blackness: 20%),
+        0.2
+      );
+      display: block;
+      box-sizing: border-box;
+      width: 100%;
+      border-radius: 2em;
+      padding: 0.5em 2em;
+      border-left: 0.5em solid
+        fade-by(color.adjust($theme-color, $blackness: 80%), 0.2);
+    }
+
+    > blockquote:hover {
+      opacity: 1;
     }
   }
 }
