@@ -19,6 +19,15 @@
   @return $res;
 }
 
+@mixin --aliceblue-article-default-text-color-style(
+  $color,
+  $shadow: (1px 1px 2px),
+  $alpha: 0.3
+) {
+  color: $color;
+  text-shadow: #{$shadow} fade-by($color, $alpha);
+}
+
 @mixin article-default(
   $article: "article",
   $color: black,
@@ -29,6 +38,7 @@
   $minimal-font-size: 12px,
   $font-family: inherit,
   $code-font: monospace,
+  $max-width: 900px
 ) {
   $text-containers: (p, "ul > li", "ol > li", h1, h2, h3, h4, h5, h6);
   #{$article},
@@ -36,8 +46,12 @@
   #{$article} blockquote > blockquote {
     font-family: $font-family;
     font-size: max(min(1em, 4vw), $minimal-font-size);
+    width: min($max-width, calc(100% - 6em));
+    box-sizing: content-box;
+    padding: 2em calc(50% - min($max-width, calc(100% - 6em)) / 2);
+
     > * {
-      transition: $transition-duration color;
+      transition: $transition-duration color, $transition-duration text-shadow;
       color: fade-by($color);
       width: 100%;
       box-sizing: border-box;
@@ -57,23 +71,33 @@
     }
 
     > *:hover {
-      color: red; //$color;
-
+      color: $color;
+      text-shadow: 1px 1px 2px fade-by($color, 0.3);
       > a:link {
-        color: $link-color;
+        // color: $link-color;
+        @include --aliceblue-article-default-text-color-style($link-color);
       }
 
       > a:visited {
-        color: color.adjust($link-color, $hue: -90deg, $blackness: 20%);
+        // color: color.adjust($link-color, $hue: -90deg, $blackness: 20%);
+        @include --aliceblue-article-default-text-color-style(
+          color.adjust($link-color, $hue: -90deg, $blackness: 20%)
+        );
       }
 
       > a:hover {
-        color: color.adjust($link-color, $hue: 15deg);
+        // color: color.adjust($link-color, $hue: 15deg);
+        @include --aliceblue-article-default-text-color-style(
+          color.adjust($link-color, $hue: 15deg)
+        );
         cursor: pointer;
       }
 
       > a:active {
-        color: color.adjust($link-color, $hue: 25deg, $blackness: -20%);
+        // color: color.adjust($link-color, $hue: 25deg, $blackness: -20%);
+        @include --aliceblue-article-default-text-color-style(
+          color.adjust($link-color, $hue: 25deg, $blackness: -20%)
+        );
       }
     }
 
@@ -125,7 +149,7 @@
       > h#{$i} {
         font-size: $header-font-size * 1em;
         font-weight: bold;
-        margin-bottom: math.div(0.7em, $header-font-size);
+        margin: math.div(0.7em, $header-font-size) 0;
         text-align: center;
       }
       $header-font-size: $header-font-size * 0.9;
@@ -178,7 +202,6 @@
     }
 
     > pre {
-      width: 100%;
       box-sizing: border-box;
       font-family: $code-font;
       font-size: 0.9em;
@@ -191,7 +214,7 @@
     }
 
     > img {
-      margin: 3em 0;
+      // margin: 3em 0;
       display: inline;
       transition: $transition-duration;
       opacity: 0.8;
@@ -301,9 +324,11 @@
     ul > ul:hover {
       > li {
         color: fade-by($color);
+        text-shadow: none;
       }
       > li:hover {
-        color: red;
+        color: $color;
+        text-shadow: 1px 1px 2px fade-by($color, 0.3);
       }
     }
 
@@ -327,6 +352,8 @@
 
     > blockquote:hover {
       opacity: 1;
+      color: fade-by($color);
+      text-shadow: none;
     }
   }
 }
