@@ -28,7 +28,7 @@
   text-shadow: #{$shadow}, fade-by($color, $alpha);
 }
 
-@mixin article-default(
+@mixin default(
   $article: "article",
   $color: black,
   $link-color: deepskyblue,
@@ -370,6 +370,7 @@
       transition: $transition-duration;
       font-size: 1em;
       margin-left: 1em;
+      padding: 0;
       transition: none;
       > li {
         color: fade-by($color);
